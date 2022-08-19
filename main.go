@@ -8,10 +8,11 @@ import (
 
 	"google.golang.org/grpc"
 
-	uploadpb "pcap_statistics/proto"
+	uploadpb "pcap_statistics/internal/proto"
 
-	"pcap_statistics/sender"
-	"pcap_statistics/uploader"
+	"pcap_statistics/internal/metrics"
+	"pcap_statistics/internal/sender"
+	"pcap_statistics/internal/uploader"
 )
 
 var client sender.Client
@@ -24,6 +25,7 @@ func main() {
 	lis, err := net.Listen("tcp", addr)
 	fmt.Println("GRPC server has started")
 	if err != nil {
+
 		log.Fatal(err)
 	}
 	defer lis.Close()
@@ -33,6 +35,7 @@ func main() {
 
 	rpcSrv := grpc.NewServer()
 
+	go metrics.Metrics(addr)
 	uploadpb.RegisterUploadServiceServer(rpcSrv, uplSrv)
 
 	log.Fatal(rpcSrv.Serve(lis))

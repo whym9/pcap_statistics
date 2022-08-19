@@ -1,11 +1,13 @@
 package process
 
 import (
+	"io"
 	"strconv"
 	"time"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
+	"github.com/google/gopacket/pcap"
 )
 
 type ProcessInterface interface {
@@ -43,7 +45,8 @@ var (
 	dns layers.DNS
 )
 
-func (p Processor) Process(packets []Packet) Protocols {
+func (p Processor) Process(handle *pcap.Handle) (Protocols, error) {
+
 	parser := gopacket.NewDecodingLayerParser(
 		layers.LayerTypeEthernet,
 		&eth,
@@ -58,9 +61,17 @@ func (p Processor) Process(packets []Packet) Protocols {
 
 	counter := Protocols{}
 
-	for _, pack := range packets {
+	for {
 
-		parser.DecodeLayers(pack.Data, &decoded)
+		data, _, err := handle.ZeroCopyReadPacketData()
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			return Protocols{}, err
+		}
+		parser.DecodeLayers(data, &decoded)
 
 		for _, layer := range decoded {
 			if layer == layers.LayerTypeTCP {
@@ -79,7 +90,7 @@ func (p Processor) Process(packets []Packet) Protocols {
 
 	}
 
-	return counter
+	return counter, nil
 }
 
 func Stringify(counter Protocols) string {
