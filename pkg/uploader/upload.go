@@ -3,10 +3,11 @@ package uploader
 import (
 	"log"
 	"os"
-	"pcap_statistics/internal/process"
-	"pcap_statistics/internal/receiver"
-	"pcap_statistics/internal/sender"
 	"time"
+
+	"github.com/whym9/pcap_statistics/pkg/process"
+	"github.com/whym9/receiving_service/pkg/receiver"
+	"github.com/whym9/receiving_service/pkg/sender"
 
 	"github.com/google/gopacket/pcap"
 )
