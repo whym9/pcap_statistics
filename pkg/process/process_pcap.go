@@ -10,10 +10,6 @@ import (
 	"github.com/google/gopacket/pcap"
 )
 
-type ProcessInterface interface {
-	Process(packets []Packet) Protocols
-}
-
 type Processor struct{}
 
 type Protocols struct {
