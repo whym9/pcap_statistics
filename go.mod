@@ -1,4 +1,4 @@
-module pcap_statistics
+module github.com/whym9/pcap_statistics
 
 go 1.18
 

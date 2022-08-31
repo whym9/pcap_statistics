@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 
-	"pcap_statistics/internal/uploader"
+	"pcap_statistics/pkg/uploader"
 )
 
 func main() {
