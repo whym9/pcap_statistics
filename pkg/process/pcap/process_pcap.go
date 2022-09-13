@@ -1,16 +1,17 @@
 package process
 
 import (
+	"encoding/json"
 	"io"
+	"os"
 	"strconv"
 	"time"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
+	"github.com/whym9/receiving_service/pkg/metrics"
 )
-
-type Processor struct{}
 
 type Protocols struct {
 	TCP  int `json: "TCP"`
@@ -26,10 +27,13 @@ type Capture struct {
 	InterfaceIndex int           `json :  "index"`
 	AccalaryData   []interface{} `json: "accalary"`
 }
+type PcapHandle struct {
+	metrics.Metrics
+	dir string
+}
 
-type Packet struct {
-	Ci   Capture
-	Data []byte
+func NewPcapHandler(dir string, m metrics.Metrics) PcapHandle {
+	return PcapHandle{m, dir}
 }
 
 var (
@@ -41,7 +45,22 @@ var (
 	dns layers.DNS
 )
 
-func (p Processor) Process(handle *pcap.Handle) (Protocols, error) {
+func (p PcapHandle) Process(data []byte) (string, error) {
+
+	name := p.dir + "/" + time.Now().Format("02-01-2002-59595898") + ".pcapng"
+	file, err := os.Create(name)
+
+	if err != nil {
+		return "", err
+	}
+
+	file.Write(data)
+	defer file.Close()
+	handle, err := pcap.OpenOfflineFile(file)
+
+	if err != nil {
+		return "", err
+	}
 
 	parser := gopacket.NewDecodingLayerParser(
 		layers.LayerTypeEthernet,
@@ -65,7 +84,7 @@ func (p Processor) Process(handle *pcap.Handle) (Protocols, error) {
 		}
 
 		if err != nil {
-			return Protocols{}, err
+			return "", err
 		}
 		parser.DecodeLayers(data, &decoded)
 
@@ -85,13 +104,28 @@ func (p Processor) Process(handle *pcap.Handle) (Protocols, error) {
 		}
 
 	}
+	bin, err := json.Marshal(counter)
 
-	return counter, nil
+	if err != nil {
+		return "", err
+	}
+	res, err := Stringify(bin)
+
+	if err != nil {
+		return "", nil
+	}
+
+	return res, nil
 }
 
-func Stringify(counter Protocols) string {
+func Stringify(obj []byte) (string, error) {
+	counter := Protocols{}
+	err := json.Unmarshal(obj, &counter)
+	if err != nil {
+		return "", err
+	}
 	return "TCP: " + strconv.Itoa(counter.TCP) + "\nUDP: " +
 		strconv.Itoa(counter.UDP) + "\nIPv4: " +
 		strconv.Itoa(counter.IPv4) + "\nIPv6: " +
-		strconv.Itoa(counter.IPv6)
+		strconv.Itoa(counter.IPv6), nil
 }

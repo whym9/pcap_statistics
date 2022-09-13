@@ -1,6 +1,5 @@
 package process
 
-type ProcessInterface interface {
-	Process(opts any) (interface{}, error)
-	Stringify(opts any) string
+type Process interface {
+	Process(data []byte) (string, error)
 }
