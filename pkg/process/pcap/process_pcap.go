@@ -30,8 +30,8 @@ type PcapHandle struct {
 	dir string
 }
 
-func NewPcapHandler(dir string) PcapHandle {
-	return PcapHandle{dir}
+func NewPcapHandler() PcapHandle {
+	return PcapHandle{os.Getenv("DIR")}
 }
 
 var (
