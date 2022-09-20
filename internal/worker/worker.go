@@ -22,10 +22,10 @@ func NewWorker(m metrics.Metrics, r receiver.Receiver, s sender.Sender, p proces
 	return Worker{m, r, s, p, ch1, ch2}
 }
 
-func (w Worker) Work(addr1, addr2, addr3 string) {
-	go w.sender.StartServer(addr1)
-	go w.receiver.StartServer(addr2)
-	go w.metrics.StartMetrics(addr3)
+func (w Worker) Work() {
+	go w.sender.StartServer()
+	go w.receiver.StartServer()
+	go w.metrics.StartMetrics()
 
 	for {
 		data := <-w.ch1

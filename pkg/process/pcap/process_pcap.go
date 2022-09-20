@@ -10,7 +10,6 @@ import (
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
-	"github.com/whym9/receiving_service/pkg/metrics"
 )
 
 type Protocols struct {
@@ -28,12 +27,11 @@ type Capture struct {
 	AccalaryData   []interface{} `json: "accalary"`
 }
 type PcapHandle struct {
-	metrics.Metrics
 	dir string
 }
 
-func NewPcapHandler(dir string, m metrics.Metrics) PcapHandle {
-	return PcapHandle{m, dir}
+func NewPcapHandler(dir string) PcapHandle {
+	return PcapHandle{dir}
 }
 
 var (
@@ -47,7 +45,7 @@ var (
 
 func (p PcapHandle) Process(data []byte) (string, error) {
 
-	name := p.dir + "/" + time.Now().Format("02-01-2002-59595898") + ".pcapng"
+	name := p.dir + "/" + time.Now().Format("02-01-2006-155555") + ".pcapng"
 	file, err := os.Create(name)
 
 	if err != nil {

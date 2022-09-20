@@ -2,10 +2,7 @@ module github.com/whym9/pcap_statistics
 
 go 1.18
 
-require (
-	github.com/google/gopacket v1.1.19
-	github.com/whym9/receiving_service v0.0.0-20220902124332-88faf31e027c
-)
+require github.com/google/gopacket v1.1.19
 
 require (
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
@@ -19,6 +16,7 @@ require (
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/whym9/receiving_service v0.0.0-20220919123525-f6532cc78907
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	golang.org/x/text v0.3.7 // indirect

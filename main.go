@@ -12,11 +12,6 @@ import (
 
 func main() {
 
-	addr1 := *flag.String("address", "localhost:6006", "address of the server")
-	addr2 := *flag.String("grpc_address", ":443", "address of the grpc sender client")
-	addr3 := *flag.String("metric_address", "8008", "metrics address")
-	dir := *flag.String("dir", "files", "directory for saving files")
-
 	flag.Parse()
 
 	ch1 := make(chan []byte)
@@ -26,9 +21,9 @@ func main() {
 
 	GRPC_Sender := sender.NewGRPCHandler(Promo_Handler, ch2)
 
-	GRPC_Receiver := receiver.NewServer(Promo_Handler, &ch1)
-	Pcap_Handler := process.NewPcapHandler(dir, Promo_Handler)
+	GRPC_Receiver := receiver.NewServer(Promo_Handler, ch1)
+	Pcap_Handler := process.NewPcapHandler()
 
 	w := worker.NewWorker(Promo_Handler, GRPC_Receiver, GRPC_Sender, Pcap_Handler, ch1, ch2)
-	w.Work(addr1, addr2, addr3)
+	w.Work()
 }
