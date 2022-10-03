@@ -32,20 +32,20 @@ func (w Worker) Work() {
 
 		counter, err := w.processor.Process(data)
 		if err != nil {
+			fmt.Println(err.Error())
 			w.ch1 <- []byte("Could not make statistics")
 			continue
 		}
 
-		w.ch1 <- []byte(counter)
-
-		w.ch2 <- []byte(counter)
-		<-w.ch2
 		w.ch2 <- data
+		<-w.ch2
+		w.ch2 <- counter
 		mes := <-w.ch2
 
 		if len(mes) > 0 {
-			fmt.Printf("The error occured while saving: %v\n", err)
+			w.ch1 <- []byte("Could not save")
 		}
+		w.ch1 <- counter
 
 	}
 

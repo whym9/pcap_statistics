@@ -2,6 +2,7 @@ package process
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"strconv"
@@ -43,21 +44,22 @@ var (
 	dns layers.DNS
 )
 
-func (p PcapHandle) Process(data []byte) (string, error) {
+func (p PcapHandle) Process(data []byte) ([]byte, error) {
 
-	name := p.dir + "/" + time.Now().Format("02-01-2006-155555") + ".pcapng"
+	name := p.dir + "/" + time.Now().Format("02-01-2006-155555") + ".pcap"
 	file, err := os.Create(name)
 
 	if err != nil {
-		return "", err
+		return []byte{}, err
 	}
 
 	file.Write(data)
-	defer file.Close()
-	handle, err := pcap.OpenOfflineFile(file)
+	file.Close()
+	handle, err := pcap.OpenOffline(name)
 
 	if err != nil {
-		return "", err
+
+		return []byte{}, err
 	}
 
 	parser := gopacket.NewDecodingLayerParser(
@@ -82,7 +84,8 @@ func (p PcapHandle) Process(data []byte) (string, error) {
 		}
 
 		if err != nil {
-			return "", err
+			fmt.Println("2")
+			return []byte{}, err
 		}
 		parser.DecodeLayers(data, &decoded)
 
@@ -102,15 +105,11 @@ func (p PcapHandle) Process(data []byte) (string, error) {
 		}
 
 	}
-	bin, err := json.Marshal(counter)
+	res, err := json.Marshal(counter)
 
 	if err != nil {
-		return "", err
-	}
-	res, err := Stringify(bin)
 
-	if err != nil {
-		return "", nil
+		return []byte{}, err
 	}
 
 	return res, nil
@@ -120,6 +119,7 @@ func Stringify(obj []byte) (string, error) {
 	counter := Protocols{}
 	err := json.Unmarshal(obj, &counter)
 	if err != nil {
+
 		return "", err
 	}
 	return "TCP: " + strconv.Itoa(counter.TCP) + "\nUDP: " +

@@ -1,5 +1,5 @@
 package process
 
 type Process interface {
-	Process(data []byte) (string, error)
+	Process(data []byte) ([]byte, error)
 }
