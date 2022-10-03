@@ -4,8 +4,8 @@ import (
 	"flag"
 
 	"github.com/whym9/pcap_statistics/internal/worker"
-	metrics "github.com/whym9/pcap_statistics/pkg/metrics/prometheus"
 	process "github.com/whym9/pcap_statistics/pkg/process/pcap"
+	metrics "github.com/whym9/receiving_service/pkg/metrics/prometheus"
 	receiver "github.com/whym9/receiving_service/pkg/receiver/GRPC"
 	sender "github.com/whym9/receiving_service/pkg/sender/GRPC"
 )
